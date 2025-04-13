@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-# Install system dependencies
+# Install system dependencies with clean up
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -25,15 +25,14 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.9/cmake-3.27.9
 # Set working directory
 WORKDIR /app
 
-# First copy only requirements to cache the pip install step
+# Copy requirements first for caching
 COPY requirements.txt .
 
-# Install Python dependencies in two stages
+# Install Python dependencies in stages
 RUN pip install --upgrade pip && \
+    pip install --no-cache-dir numpy==1.26.4 && \
+    pip install --no-cache-dir dlib==19.24.2 --install-option="--yes" --install-option="--no" --install-option="DLIB_USE_CUDA" && \
     pip install --no-cache-dir -r requirements.txt --ignore-installed
-
-# Install dlib separately with build optimizations
-RUN pip install --no-cache-dir dlib==19.24.2 --global-option=--yes --global-option="--no" --global-option="DLIB_USE_CUDA"
 
 # Copy the rest of the application
 COPY . .
