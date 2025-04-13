@@ -1,0 +1,9 @@
+.venv/
+*.db
+*.bin
+*.zip
+static/
+__pycache__/
+*.pyc
+logging
+*.log
