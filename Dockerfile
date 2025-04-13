@@ -31,8 +31,8 @@ COPY requirements.txt .
 # Install Python dependencies in stages
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir numpy==1.26.4 && \
-    pip install --no-cache-dir dlib==19.24.2 --install-option="--yes" --install-option="--no" --install-option="DLIB_USE_CUDA" && \
-    pip install --no-cache-dir -r requirements.txt --ignore-installed
+    pip install --no-cache-dir dlib==19.24.2 && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
