@@ -1,32 +1,39 @@
-FROM python:3.10-slim as builder
+FROM python:3.10-bullseye as builder
 
-# Stage 1: Build dlib in a separate stage
+# Stage 1: Build environment with all necessary tools
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     wget \
+    unzip \
     git \
+    curl \
     libopenblas-dev \
     liblapack-dev \
     libx11-dev \
     libgtk-3-dev \
+    libboost-all-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install specific CMake version
+# Install specific CMake version (required for dlib)
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.9/cmake-3.27.9-linux-x86_64.sh && \
     chmod +x cmake-3.27.9-linux-x86_64.sh && \
     ./cmake-3.27.9-linux-x86_64.sh --skip-license --prefix=/usr/local && \
     rm cmake-3.27.9-linux-x86_64.sh
 
 WORKDIR /app
+
+# Install dlib with specific environment variables
+ENV DLIB_USE_CUDA=0
 RUN pip install --upgrade pip && \
     pip install numpy==1.26.4 && \
-    pip install dlib==19.24.2
+    pip install dlib==19.24.2 --verbose
 
 # Final stage
-FROM python:3.10-slim
+FROM python:3.10-slim-bullseye
 
-# Install runtime dependencies
+# Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     libopenblas0 \
     liblapack3 \
