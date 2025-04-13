@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import face_recognition
@@ -10,12 +12,13 @@ from wtforms.validators import DataRequired, Length
 import pickle
 import base64
 
+
 # Flask & Database Configuration
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "my-secrets"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/moundir/PycharmProjects/Meeting_Web_App/moundir.db"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'my-secrets')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////app/instance/moundir.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF
+app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for Railway
 
 db = SQLAlchemy(app)
 
