@@ -1,6 +1,40 @@
+FROM python:3.10-bullseye as builder
+
+# Stage 1: Build environment with all necessary tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    wget \
+    unzip \
+    git \
+    curl \
+    libopenblas-dev \
+    liblapack-dev \
+    libx11-dev \
+    libgtk-3-dev \
+    libboost-all-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install specific CMake version (required for dlib)
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.9/cmake-3.27.9-linux-x86_64.sh && \
+    chmod +x cmake-3.27.9-linux-x86_64.sh && \
+    ./cmake-3.27.9-linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    rm cmake-3.27.9-linux-x86_64.sh
+
+WORKDIR /app
+
+# Install dlib with specific build options
+RUN pip install --upgrade pip && \
+    pip install numpy==1.26.4 && \
+    git clone https://github.com/davisking/dlib.git && \
+    cd dlib && \
+    python setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA
+
+# Final stage
 FROM python:3.10-slim-bullseye
 
-# Install runtime dependencies
+# Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     libopenblas0 \
     liblapack3 \
@@ -10,14 +44,20 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Install from pre-built wheels
-COPY requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install numpy==1.26.4 && \
-    pip install https://files.pythonhosted.org/packages/8f/2f/14a6057f6c0b6f0b3b8b3f8f8b8b3f8b8b3f8b8b3f8b8b3f8b8b3f8b8b3/dlib-19.24.2-cp310-cp310-manylinux_2_31_x86_64.whl && \
-    pip install -r requirements.txt
+# Copy from builder
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
 COPY . .
 
+# Environment variables
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+
 EXPOSE 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "app:app"]
