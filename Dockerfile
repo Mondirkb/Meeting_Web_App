@@ -49,4 +49,4 @@ ENV PORT=8000
 EXPOSE $PORT
 
 # Run with gunicorn
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --workers 4 app:app"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --workers 1 app:app"]
