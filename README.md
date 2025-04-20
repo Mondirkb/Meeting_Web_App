@@ -42,23 +42,20 @@ cd face-login-meeting-app
 pip install -r requirements.txt
 ```
 ## 🐳 Docker Deployment
+
+You can run this face recognition Flask app inside a Docker container easily. Here's how:
+
+### 📁 Prerequisites
+
+- [Docker](https://www.docker.com/products/docker-desktop) installed on your system.
+
+### 📦 Build the Docker Image
+
 ```bash
-FROM python:3.10-slim
+docker build -t face-recognition-app .
 
-WORKDIR /app
-COPY . /app
-
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-EXPOSE 5000
-CMD ["python", "app.py"]
-
-```
-## 📦 Build Docker Image
-
-``` bash
-docker build -t face-login-app .
 ▶ Run Docker Container
-docker run -d -p 5000:5000 --name facerec-app face-login-app
+docker run -it --rm -p 5000:5000 face-recognition-app
 ```
+
+
