@@ -13,16 +13,18 @@ import pickle
 import base64
 
 
-# Flask & Database Configuration
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'my-secrets')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////app/instance/moundir.db')
+# using for local file
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/moundir/PycharmProjects/Meeting_Web_App//moundir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for Railway
 
 db = SQLAlchemy(app)
 
-# Login Manager Setup
+# Login Manager
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
@@ -36,7 +38,7 @@ class Register(UserMixin, db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     face_encoding = db.Column(db.PickleType, nullable=True)  # Store face encoding
 
-# Create Database Tables
+# Create Database
 with app.app_context():
     db.create_all()
 
@@ -52,7 +54,7 @@ class LoginForm(FlaskForm):
     email = EmailField(label='Email', validators=[DataRequired()])
     photo_data = HiddenField(label="Photo Data", validators=[DataRequired()])
 
-# User Loader for Flask-Login
+#  Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     return Register.query.get(int(user_id))
@@ -86,13 +88,13 @@ def login():
             return redirect(url_for("register"))
 
         try:
-            # Convert base64 to image
+
             header, encoded = photo_data.split(",", 1)
             binary_data = base64.b64decode(encoded)
             image = np.frombuffer(binary_data, dtype=np.uint8)
             frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-            # Process image
+
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             face_encodings = face_recognition.face_encodings(rgb_frame)
 
@@ -100,7 +102,7 @@ def login():
                 flash("No face detected. Please try again.", "danger")
                 return redirect(url_for("login"))
 
-            # Compare with stored encoding
+
             stored_encoding = pickle.loads(user.face_encoding) if user.face_encoding else None
             if stored_encoding is None:
                 flash("No face data found for this user.", "danger")
@@ -136,25 +138,25 @@ def register():
         username = form.username.data
         email = form.email.data
 
-        # Check if email or username already exists
+
         if Register.query.filter_by(email=email).first() or Register.query.filter_by(username=username).first():
             flash("Email or username already exists.", "danger")
             return redirect(url_for("register"))
 
-        # Get photo data from form
+
         photo_data = form.photo_data.data
         if not photo_data:
             flash("No photo captured. Please take a photo.", "danger")
             return redirect(url_for("register"))
 
         try:
-            # Convert base64 to image
+
             header, encoded = photo_data.split(",", 1)
             binary_data = base64.b64decode(encoded)
             image = np.frombuffer(binary_data, dtype=np.uint8)
             frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-            # Process image
+
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             face_encodings = face_recognition.face_encodings(rgb_frame)
 
@@ -162,7 +164,7 @@ def register():
                 flash("No face detected. Please try again.", "danger")
                 return redirect(url_for("register"))
 
-            # Store the first face encoding
+
             face_encoding = pickle.dumps(face_encodings[0])
 
             new_user = Register(

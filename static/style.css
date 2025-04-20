@@ -71,7 +71,7 @@ body {
     cursor: not-allowed;
 }
 
-/* Webcam and photo preview */
+
 #photo-preview {
     border: 2px solid #ffffff;
     border-radius: 8px;
@@ -83,7 +83,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* Alerts */
+
 .alert {
     margin-bottom: 1rem;
 }
@@ -98,7 +98,7 @@ body {
     color: white;
 }
 
-/* Ensure webcam section doesn’t push button out */
+/* Ensure webcam section */
 .webcam-section {
     position: relative;
     margin-bottom: 1rem;
@@ -132,7 +132,7 @@ body {
     border: 1px solid #6a11cb;
 }
 
-/* and so on... prefix all your CSS */
+
 .footer {
     position: absolute;
     bottom: 10px;

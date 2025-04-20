@@ -65,7 +65,7 @@
 <p class="text-white-50 mb-4">Create an account & take a photo for verification</p>
 
 <form action="{{ url_for('register') }}" method="POST" id="register-form">
-    <!-- Webcam Section -->
+
     <div class="webcam-section">
         <video id="webcam" width="320" height="240" autoplay></video>
         <canvas id="photo-canvas" width="320" height="240" style="display:none;"></canvas>
@@ -109,7 +109,7 @@
         <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
     </div>
 
-    <!-- Hidden input for photo data -->
+
     <input type="hidden" id="photo-data" name="photo_data">
 
     <button class="btn btn-custom w-100" type="submit" id="submit-btn" disabled>Register</button>
