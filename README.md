@@ -37,6 +37,28 @@ This is a web application built with **Flask**, **OpenCV**, and **face_recogniti
 ## 🛠️ Installation
 
 ```bash
-git clone https://github.com/yourusername/face-login-meeting-app.git
+git clone https://github.com/Mondirkb/Meeting_Web_App.git
 cd face-login-meeting-app
 pip install -r requirements.txt
+```
+## 🐳 Docker Deployment
+```bash
+FROM python:3.10-slim
+
+WORKDIR /app
+COPY . /app
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+EXPOSE 5000
+CMD ["python", "app.py"]
+
+```
+## 📦 Build Docker Image
+
+``` bash
+docker build -t face-login-app .
+▶ Run Docker Container
+docker run -d -p 5000:5000 --name facerec-app face-login-app
+```
