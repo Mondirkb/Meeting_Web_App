@@ -58,4 +58,30 @@ docker build -t face-recognition-app .
 docker run -it --rm -p 5000:5000 face-recognition-app
 ```
 
+## 🔐 Serve with HTTPS using Caddy (Local Network Access with Camera Support)
 
+To make your app accessible from other devices (like mobile phones on the same Wi-Fi network) and to enable webcam usage in modern browsers, run your app over HTTPS locally using [Caddy](https://caddyserver.com).
+
+---
+
+### 📝 Caddyfile Example Configuration
+
+<details>
+<summary><strong>Click to expand the example Caddyfile</strong></summary>
+
+```caddyfile
+# Replace the IP address with your actual local IP address
+192.168.1.137:443 {
+    reverse_proxy localhost:8000
+    tls internal
+}
+```
+### 📝 HOW to Run Caddyfile
+```caddyfile
+# Stop anything using Caddy's admin port if needed
+sudo kill $(sudo lsof -t -i :2019)
+
+# Start Caddy using the config
+sudo caddy run --config ./Caddyfile --adapter caddyfile
+
+```
